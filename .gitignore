@@ -1,0 +1,8 @@
+# Output from code.
+output/
+
+# IntelliJ.
+idea/
+
+# Notebook checkpoints.
+.ipynb_checkpoints/
