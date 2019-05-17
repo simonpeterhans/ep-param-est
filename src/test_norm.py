@@ -48,6 +48,6 @@ for theta, desired_grid_size in params:
 
     history = LossHistory()
     model.fit(sampled_params, sampled_grid, shuffle=True, batch_size=64, epochs=n_epochs, callbacks=[history])
-    model.save(path  + name + '-m.h5')
+    model.save(path + name + '-m.h5')
 
     pd.DataFrame(history.losses).to_csv(path + name + '-l.csv', header=False)
