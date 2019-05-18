@@ -5,9 +5,10 @@ from tbd import Distribution
 
 
 class NormalDistribution(Distribution):
-    def __init__(self, x_min, x_max, mu_min, mu_max, sigma_min, sigma_max):
+    def __init__(self, name, x_min, x_max, mu_min, mu_max, sigma_min, sigma_max):
         """
         TBA
+        :param name:
         :param x_min:
         :param x_max:
         :param mu_min:
@@ -15,6 +16,7 @@ class NormalDistribution(Distribution):
         :param sigma_min:
         :param sigma_max:
         """
+        super().__init__(name)
         self.x_min = x_min
         self.x_max = x_max
         self.mu_min = mu_min
