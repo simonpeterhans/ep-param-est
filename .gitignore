@@ -5,4 +5,4 @@ output/
 idea/
 
 # Notebook checkpoints.
-.ipynb_checkpoints/
+notebooks/.ipynb_checkpoints/
