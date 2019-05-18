@@ -24,12 +24,12 @@ if not os.path.exists(path):
 logging.basicConfig(filename=test_name + '.log', level=logging.INFO)
 
 # Parameter settings and number of samples per sampled parameter vector.
-n_param_vectors = [100000]
-grid_sizes = np.linspace(50, 250, 3, dtype=int)
+n_param_vectors = [150000]
+grid_sizes = np.linspace(50, 150, 3, dtype=int)
 combinations = product(n_param_vectors, grid_sizes)
 
 # NN Settings.
-n_epochs = 2
+n_epochs = 5
 n_dense_layers = 20
 dense_scaling = 1
 depth = 25
