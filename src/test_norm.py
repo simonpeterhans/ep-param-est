@@ -10,9 +10,6 @@ from keras.utils import plot_model
 from norm import NormalDistribution
 from tbd import ModelParameters, create_model, LossHistory
 
-# TODO Implement proper logging.
-
-
 test_name = 'norm'
 path = os.path.join('output', test_name)  # TODO Where/How to store files?
 now = datetime.datetime.now().strftime("%Y%m%d%H%M%S-")
@@ -21,6 +18,7 @@ os.chdir("..")
 if not os.path.exists(path):
     os.makedirs(path)
 
+# TODO Implement proper logging.
 logging.basicConfig(filename=test_name + '.log', level=logging.INFO)
 
 # Parameter settings and number of samples per sampled parameter vector.
