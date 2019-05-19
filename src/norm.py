@@ -5,16 +5,21 @@ from tbd import Distribution
 
 
 class NormalDistribution(Distribution):
+    """
+    Class to sample from a normal distribution.
+    """
+
     def __init__(self, name, x_min, x_max, mu_min, mu_max, sigma_min, sigma_max):
         """
-        TBA
-        :param name:
-        :param x_min:
-        :param x_max:
-        :param mu_min:
-        :param mu_max:
-        :param sigma_min:
-        :param sigma_max:
+        Initializes the object by setting the relevant parameters.
+
+        :param name: The identifier of the object.
+        :param x_min: Minimum value to be sampled.
+        :param x_max: Maximum value to be sampled.
+        :param mu_min: Minimum mu value to sample when generating parameters.
+        :param mu_max: Maximum mu value to sample when generating parameters.
+        :param sigma_min: Minimum sigma value to sample when generating parameters.
+        :param sigma_max: Maximum sigma value to sample when generating parameters.
         """
         super().__init__(name)
         self.x_min = x_min
@@ -28,10 +33,12 @@ class NormalDistribution(Distribution):
 
     def gen_data(self, n_param_samples, grid_size_per_sample):
         """
-        TBA
-        :param n_param_samples:
-        :param grid_size_per_sample:
-        :return:
+        Abstract method to generate data.
+
+        :param n_param_samples: Number of thetas (parameter vectors) to generate.
+        :param grid_size_per_sample: Number of samples to generate from the generated parameter
+        vectors, i.e., the grid size.
+        :return: The sampled parameters and the grid sampled from the sampled parameters.
         """
         mu = ss.uniform(self.mu_min, self.mu_max - self.mu_min).rvs(n_param_samples)
         sigma = ss.uniform(self.sigma_min, self.sigma_max - self.sigma_min).rvs(n_param_samples)
@@ -45,10 +52,12 @@ class NormalDistribution(Distribution):
 
     def gen_fun(self, n_params_samples, grid_size_per_sample):
         """
-        TBA
-        :param n_params_samples:
-        :param grid_size_per_sample:
-        :return:
+        Generator function for this distribution to dynamically generate (yield) data.
+
+        :param n_param_samples: Number of thetas (parameter vectors) to generate.
+        :param grid_size_per_sample: Number of samples to generate from the generated parameter
+        vectors, i.e., the grid size.
+        :return: The sampled parameters and the grid sampled from the sampled parameters.
         """
         while 1:
             # TODO This could potentially be in the parent class.
