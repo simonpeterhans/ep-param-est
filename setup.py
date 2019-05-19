@@ -7,7 +7,7 @@ with open('LICENSE') as f:
     license = f.read()
 
 setup(
-    name='src',
+    name='param_est',
     version='0.0.0',
     description='tba',
     # long_description=readme,

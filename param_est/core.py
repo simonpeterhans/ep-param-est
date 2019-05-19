@@ -1,4 +1,3 @@
-# TODO Find a name for our module!
 import random
 import string
 from abc import abstractmethod

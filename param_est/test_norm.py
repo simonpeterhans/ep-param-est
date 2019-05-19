@@ -7,8 +7,8 @@ import numpy as np
 import pandas as pd
 from keras.utils import plot_model
 
+from core import ModelParameters, create_model, LossHistory
 from norm import NormalDistribution
-from tbd import ModelParameters, create_model, LossHistory
 
 test_name = 'norm'
 now = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
