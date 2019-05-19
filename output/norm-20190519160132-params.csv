@@ -1,4 +1,0 @@
- ,model_id,n_epochs,n_dense_layers,dense_scaling,depth,n_kernels,kernel_size,out_dense_2,grid_size,name
-0,MFT74I  ,5       ,20            ,1            ,25   ,15       ,40         ,4          ,41       ,150000-41
-1,65H8X0  ,5       ,20            ,1            ,25   ,15       ,40         ,6          ,81       ,150000-81
-2,52SOIP  ,5       ,20            ,1            ,25   ,15       ,40         ,9          ,141      ,150000-141

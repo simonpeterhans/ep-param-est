@@ -27,7 +27,7 @@ class ModelParameters(object):
         :param kernel_size:
         """
         # TODO Consider using default values in function signature.
-        self.model_id = self.__id_generator(6)
+        self.name = self.__id_generator(6)
         self.n_epochs = n_epochs
         self.n_dense_layers = n_dense_layers
         self.dense_scaling = dense_scaling
@@ -42,6 +42,12 @@ class ModelParameters(object):
 
     @staticmethod
     def __id_generator(size=6, chars=string.ascii_uppercase + string.digits):
+        """
+        TBA
+        :param size:
+        :param chars:
+        :return:
+        """
         return ''.join(random.choice(chars) for _ in range(size))
 
     def get_params(self):
@@ -99,7 +105,6 @@ def create_model(p):
     :type p: ModelParameters
     :return:
     """
-
     model = Input(shape=(2,), name='input')
 
     dense_1, dense_2, dense_reshape = [], [], []
