@@ -42,3 +42,14 @@ class NormalDistribution(Distribution):
         sampled_grid = ss.norm(mu[:, np.newaxis], sigma[:, np.newaxis]).logpdf(x[np.newaxis, :])
 
         return sampled_params, sampled_grid
+
+    def gen_fun(self, n_params_samples, grid_size_per_sample):
+        """
+        TBA
+        :param n_params_samples:
+        :param grid_size_per_sample:
+        :return:
+        """
+        while 1:
+            # TODO This could potentially be in the parent class.
+            yield self.gen_data(n_params_samples, grid_size_per_sample)

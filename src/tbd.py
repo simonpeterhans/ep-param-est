@@ -15,11 +15,12 @@ class ModelParameters(object):
     TBA
     """
 
-    def __init__(self, n_epochs, desired_grid_size, n_dense_layers, dense_scaling, depth,
-                 n_kernels, kernel_size):
+    def __init__(self, n_epochs, batch_size, desired_grid_size, n_dense_layers, dense_scaling,
+                 depth, n_kernels, kernel_size):
         """
         TBA
         :param n_epochs:
+        :param batch_size:
         :param desired_grid_size:
         :param n_dense_layers:
         :param dense_scaling:
@@ -29,6 +30,7 @@ class ModelParameters(object):
         """
         # TODO Consider using default values in function signature.
         self.name = self.__id_generator(6)
+        self.batch_size = batch_size
         self.n_epochs = n_epochs
         self.n_dense_layers = n_dense_layers
         self.dense_scaling = dense_scaling
@@ -73,6 +75,16 @@ class Distribution(object):
 
     @abstractmethod
     def gen_data(self, n_vectors, n_samples):
+        """
+        TBA
+        :param n_vectors:
+        :param n_samples:
+        :return:
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def gen_fun(self, n_vectors, n_samples):
         """
         TBA
         :param n_vectors:

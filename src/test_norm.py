@@ -28,6 +28,7 @@ combinations = product(n_param_vectors, grid_sizes)
 
 # NN Settings.
 n_epochs = 5
+batch_size = 64
 n_dense_layers = 20
 dense_scaling = 1
 depth = 25
@@ -49,12 +50,13 @@ param_list = []
 dist_list = []
 loss_list = []
 
-for theta, desired_grid_size in combinations:
+for thetas, desired_grid_size in combinations:
     # TODO Consider wrapping the whole keras model and its method in a class.
     # Create model parameters and add to list.
-    p = ModelParameters(n_epochs, desired_grid_size, n_dense_layers, dense_scaling, depth,
-                        n_kernels, kernel_size)
-    p.name = str(theta) + '-' + str(p.grid_size)
+    p = ModelParameters(n_epochs, batch_size, desired_grid_size, n_dense_layers, dense_scaling,
+                        depth, n_kernels, kernel_size)
+    p.name = str(thetas) + '-' + str(p.grid_size)
+    # TODO Add the number of training samples into this.
     param_list.append(p.get_params())
 
     model = create_model(p)
@@ -65,17 +67,20 @@ for theta, desired_grid_size in combinations:
     # Create distribution and add to list.
     nd = NormalDistribution(p.name, x_min, x_max, mu_min, mu_max, sigma_min, sigma_max)
     dist_list.append(nd.get_params())
-    sampled_params, sampled_grid = nd.gen_data(theta, p.grid_size)
+    sampled_params, sampled_grid = nd.gen_data(thetas, p.grid_size)
 
     history = LossHistory()
 
-    model.fit(sampled_params, sampled_grid, shuffle=True, batch_size=64, epochs=n_epochs,
+    model.fit(sampled_params, sampled_grid, shuffle=True, batch_size=p.batch_size, epochs=n_epochs,
               callbacks=[history])
+    """model.fit_generator(nd.gen_fun(p.batch_size, p.grid_size),
+                        steps_per_epoch=np.ceil(thetas / p.batch_size), shuffle=True,
+                        epochs=n_epochs, callbacks=[history]"""
     model.save(os.path.join(path, p.name + '-model.h5'))
 
     loss_list.append(pd.DataFrame(history.losses, columns=[p.name]))
 
-# TODO Append number of sampled thetas to the parameter table.
-pd.concat(param_list, ignore_index=True).to_csv(path + '-params.csv')
-pd.concat(dist_list, ignore_index=True).to_csv(path + '-dists.csv')
-pd.concat(loss_list, axis=1).to_csv(path + '-losses.csv')
+    # TODO Append number of sampled thetas to the parameter table.
+    pd.concat(param_list, ignore_index=True).to_csv(path + '-params.csv')
+    pd.concat(dist_list, ignore_index=True).to_csv(path + '-dists.csv')
+    pd.concat(loss_list, axis=1).to_csv(path + '-losses.csv')
