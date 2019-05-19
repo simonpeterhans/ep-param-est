@@ -1,8 +1,8 @@
-# Output from code.
-output/
+# Output from code (currently used for testing).
+#output/
 
 # IntelliJ.
-idea/
+.idea/
 
 # Notebook checkpoints.
 notebooks/.ipynb_checkpoints/
