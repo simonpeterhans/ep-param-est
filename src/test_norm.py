@@ -57,7 +57,7 @@ for thetas, desired_grid_size in combinations:
                         depth, n_kernels, kernel_size)
     p.name = str(thetas) + '-' + str(p.grid_size)
     # TODO Add the number of training samples into this.
-    param_list.append(p.get_params())
+    param_list.append(p.to_df())
 
     model = create_model(p)
 
@@ -66,7 +66,7 @@ for thetas, desired_grid_size in combinations:
 
     # Create distribution and add to list.
     nd = NormalDistribution(p.name, x_min, x_max, mu_min, mu_max, sigma_min, sigma_max)
-    dist_list.append(nd.get_params())
+    dist_list.append(nd.to_df())
     sampled_params, sampled_grid = nd.gen_data(thetas, p.grid_size)
 
     history = LossHistory()

@@ -12,24 +12,32 @@ from keras.layers import Dense, Concatenate, Reshape, Conv2D, Lambda
 
 class ModelParameters(object):
     """
-    TBA
+    Class to store the model parameters in.
     """
 
     def __init__(self, n_epochs, batch_size, desired_grid_size, n_dense_layers, dense_scaling,
-                 depth, n_kernels, kernel_size):
+                 depth, n_kernels, kernel_size, name=None):
         """
-        TBA
-        :param n_epochs:
-        :param batch_size:
-        :param desired_grid_size:
-        :param n_dense_layers:
-        :param dense_scaling:
-        :param depth:
-        :param n_kernels:
-        :param kernel_size:
+        Sets the initial values for the parameters. Calculates out_dense_2 and adjusts
+        desired_grid_size to grid_size so the model dimensions are correct.
+
+        :param n_epochs: Number of epochs to use when using this parameters on training a model.
+        :param batch_size: Batch size.
+        :param desired_grid_size: Desired size of the grid; may get adjusted and is available as
+        grid_size.
+        :param n_dense_layers: Number of dense layers per first and second level.
+        :param dense_scaling: Scaling for the number of neurons in the first dense layer
+        (dense_scaling * depth)
+        :param depth: Model depth.
+        :param n_kernels: Number of kernels to use.
+        :param kernel_size: Size of the kernels.
+        :param name: Can be set on initialization or afterwards. If not set, a random string of
+        length 6 is generated and used as name instead.
         """
         # TODO Consider using default values in function signature.
-        self.name = self.__id_generator(6)
+        if name is None:
+            self.name = self.__id_generator(6)
+
         self.batch_size = batch_size
         self.n_epochs = n_epochs
         self.n_dense_layers = n_dense_layers
@@ -46,64 +54,72 @@ class ModelParameters(object):
     @staticmethod
     def __id_generator(size=6, chars=string.ascii_uppercase + string.digits):
         """
-        TBA
-        :param size:
-        :param chars:
-        :return:
+        Used to generate a random ID for the model so we can identify it (usually it's smarter to
+        manually set a name).
+
+        :param size: Length of the id.
+        :param chars: Selection of the characters to use, defaults to upper-case letters and digits.
+        :return: The generated string.
         """
         return ''.join(random.choice(chars) for _ in range(size))
 
-    def get_params(self):
+    def to_df(self):
         """
-        TBA
-        :return:
+        Creates a pandas data frame of the set of parameters and their values.
+
+        :return: The created data frame.
         """
         return pd.DataFrame.from_records([vars(self)], columns=vars(self).keys())
 
 
 class Distribution(object):
     """
-    TBA
+    Abstract class for distribution objects.
     """
 
     def __init__(self, name):
         """
-        TBA
-        :param name:
+        Creates a distribution object.
+
+        :param name: The identifier of the object.
         """
         self.name = name
 
     @abstractmethod
     def gen_data(self, n_vectors, n_samples):
         """
-        TBA
-        :param n_vectors:
-        :param n_samples:
-        :return:
+        Abstract method to generate data.
+
+        :param n_vectors: Number of thetas (parameter vectors) to generate.
+        :param n_samples: Number of samples to generate from the generated parameter vectors.
+        :return: The generated data (parameter vectors and their sampled data).
         """
         raise NotImplementedError
 
     @abstractmethod
     def gen_fun(self, n_vectors, n_samples):
         """
-        TBA
-        :param n_vectors:
-        :param n_samples:
-        :return:
+        Generator function for this distribution to dynamically generate data.
+
+        :param n_vectors: Number of thetas (parameter vectors) to generate.
+        :param n_samples: Number of samples to generate from the generated parameter vectors.
+        :return: Yields the generated data (parameter vectors and their sampled data).
         """
         raise NotImplementedError
 
-    def get_params(self):
+    def to_df(self):
         """
-        TBA
-        :return:
+        Creates a pandas data frame of the set of parameters and their values.
+
+        :return: The created data frame.
         """
         return pd.DataFrame.from_records([vars(self)], columns=vars(self).keys())
 
 
 class LossHistory(Callback):
     """
-    TBA
+    Loss history object to record the development of the loss value during training;
+    as of now, the loss is recorded after every epoch.
     """
 
     def on_train_begin(self, logs={}):
@@ -115,9 +131,11 @@ class LossHistory(Callback):
 
 def create_model(p):
     """
-    TBA
+    Creates the model to predict the likelihood function when given parameters of a distribution.
+
     :type p: ModelParameters
-    :return:
+    :param p: A parameter object to specify the parameters of this model.
+    :return: The created (uncompiled) model.
     """
     model = Input(shape=(2,), name='input')
 
