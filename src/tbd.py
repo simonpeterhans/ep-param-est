@@ -1,6 +1,7 @@
 # TODO Find a name for our module!
 import random
 import string
+from abc import abstractmethod
 
 import pandas as pd
 from keras import Model, Input
@@ -70,6 +71,7 @@ class Distribution(object):
         """
         self.name = name
 
+    @abstractmethod
     def gen_data(self, n_vectors, n_samples):
         """
         TBA
@@ -77,7 +79,7 @@ class Distribution(object):
         :param n_samples:
         :return:
         """
-        raise NotImplementedError('Distribution subclasses must override gen_data().')
+        raise NotImplementedError
 
     def get_params(self):
         """
