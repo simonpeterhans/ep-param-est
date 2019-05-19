@@ -53,10 +53,9 @@ loss_list = []
 for thetas, desired_grid_size in combinations:
     # TODO Consider wrapping the whole keras model and its method in a class.
     # Create model parameters and add to list.
-    p = ModelParameters(n_epochs, batch_size, desired_grid_size, n_dense_layers, dense_scaling,
-                        depth, n_kernels, kernel_size)
+    p = ModelParameters(thetas, n_epochs, batch_size, desired_grid_size, n_dense_layers,
+                        dense_scaling, depth, n_kernels, kernel_size)
     p.name = str(thetas) + '-' + str(p.grid_size)
-    # TODO Add the number of training samples into this.
     param_list.append(p.to_df())
 
     model = create_model(p)
@@ -71,11 +70,11 @@ for thetas, desired_grid_size in combinations:
 
     history = LossHistory()
 
-    model.fit(sampled_params, sampled_grid, shuffle=True, batch_size=p.batch_size, epochs=n_epochs,
-              callbacks=[history])
+    model.fit(sampled_params, sampled_grid, shuffle=True, batch_size=p.batch_size,
+              epochs=p.n_epochs, callbacks=[history])
     """model.fit_generator(nd.gen_fun(p.batch_size, p.grid_size),
                         steps_per_epoch=np.ceil(thetas / p.batch_size), shuffle=True,
-                        epochs=n_epochs, callbacks=[history]"""
+                        epochs=p.n_epochs, callbacks=[history]"""
     model.save(os.path.join(path, p.name + '-model.h5'))
 
     loss_list.append(pd.DataFrame(history.losses, columns=[p.name]))

@@ -15,12 +15,13 @@ class ModelParameters(object):
     Class to store the model parameters in.
     """
 
-    def __init__(self, n_epochs, batch_size, desired_grid_size, n_dense_layers, dense_scaling,
-                 depth, n_kernels, kernel_size, name=None):
+    def __init__(self, n_samples, n_epochs, batch_size, desired_grid_size, n_dense_layers,
+                 dense_scaling, depth, n_kernels, kernel_size, name=None):
         """
         Sets the initial values for the parameters. Calculates out_dense_2 and adjusts
         desired_grid_size to grid_size so the model dimensions are correct.
 
+        :param n_samples: Total number of samples to train this network on.
         :param n_epochs: Number of epochs to use when using this parameters on training a model.
         :param batch_size: Batch size.
         :param desired_grid_size: Desired size of the grid; may get adjusted and is available as
@@ -38,8 +39,9 @@ class ModelParameters(object):
         if name is None:
             self.name = self.__id_generator(6)
 
-        self.batch_size = batch_size
+        self.n_samples = n_samples
         self.n_epochs = n_epochs
+        self.batch_size = batch_size
         self.n_dense_layers = n_dense_layers
         self.dense_scaling = dense_scaling
         self.depth = depth
