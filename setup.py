@@ -10,10 +10,10 @@ setup(
     name='param_est',
     version='0.0.0',
     description='tba',
-    # long_description=readme,
+    long_description=readme,
     author='tba',
     author_email='tba',
     url='tba',
-    # license=license,
+    license=license,
     packages=find_packages()
 )
