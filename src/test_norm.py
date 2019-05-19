@@ -11,8 +11,8 @@ from norm import NormalDistribution
 from tbd import ModelParameters, create_model, LossHistory
 
 test_name = 'norm'
-path = os.path.join('output', test_name)  # TODO Where/How to store files?
-now = datetime.datetime.now().strftime("%Y%m%d%H%M%S-")
+now = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+path = os.path.join('output', test_name + '-' + now)  # TODO Where/How to store files?
 
 os.chdir("..")
 if not os.path.exists(path):
@@ -50,33 +50,32 @@ dist_list = []
 loss_list = []
 
 for theta, desired_grid_size in combinations:
-    name = str(theta) + '-' + str(desired_grid_size)
-
-    p = ModelParameters(name, n_epochs, desired_grid_size, n_dense_layers, dense_scaling, depth,
+    # TODO Consider wrapping the whole keras model and its method in a class.
+    # Create model parameters and add to list.
+    p = ModelParameters(n_epochs, desired_grid_size, n_dense_layers, dense_scaling, depth,
                         n_kernels, kernel_size)
-
-    # Add params of model to list.
+    p.name = str(theta) + '-' + str(p.grid_size)
     param_list.append(p.get_params())
 
     model = create_model(p)
 
-    # TODO Do this in tbd.py and use kwargs.
     model.compile(optimizer='adam', loss='mean_squared_error')
-    plot_model(model, show_shapes=True, to_file=os.path.join(path, name + '-plot.png'))
+    plot_model(model, show_shapes=True, to_file=os.path.join(path, p.name + '-plot.png'))
 
-    nd = NormalDistribution(name, x_min, x_max, mu_min, mu_max, sigma_min, sigma_max)
+    # Create distribution and add to list.
+    nd = NormalDistribution(p.name, x_min, x_max, mu_min, mu_max, sigma_min, sigma_max)
     dist_list.append(nd.get_params())
-
     sampled_params, sampled_grid = nd.gen_data(theta, p.grid_size)
 
-    history = LossHistory()  # TODO Do this in tbd.py and use kwargs.
+    history = LossHistory()
+
     model.fit(sampled_params, sampled_grid, shuffle=True, batch_size=64, epochs=n_epochs,
               callbacks=[history])
-    model.save(os.path.join(path, name + '-model.h5'))
+    model.save(os.path.join(path, p.name + '-model.h5'))
 
-    # TODO Do this in tbd.py and use kwargs.
-    loss_list.append(pd.DataFrame(history.losses, columns=[name]))
+    loss_list.append(pd.DataFrame(history.losses, columns=[p.name]))
 
-pd.concat(param_list, ignore_index=True).to_csv(path + now + 'params.csv')
-pd.concat(dist_list, ignore_index=True).to_csv(path + now + 'dists.csv')
-pd.concat(loss_list, axis=1).to_csv(path + now + 'losses.csv')
+# TODO Append number of sampled thetas to the parameter table.
+pd.concat(param_list, ignore_index=True).to_csv(path + '-params.csv')
+pd.concat(dist_list, ignore_index=True).to_csv(path + '-dists.csv')
+pd.concat(loss_list, axis=1).to_csv(path + '-losses.csv')

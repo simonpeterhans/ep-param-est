@@ -1,4 +1,7 @@
 # TODO Find a name for our module!
+import random
+import string
+
 import pandas as pd
 from keras import Model, Input
 from keras import backend
@@ -11,11 +14,10 @@ class ModelParameters(object):
     TBA
     """
 
-    def __init__(self, model_id, n_epochs, desired_grid_size, n_dense_layers, dense_scaling, depth,
+    def __init__(self, n_epochs, desired_grid_size, n_dense_layers, dense_scaling, depth,
                  n_kernels, kernel_size):
         """
         TBA
-        :param model_id:
         :param n_epochs:
         :param desired_grid_size:
         :param n_dense_layers:
@@ -25,7 +27,7 @@ class ModelParameters(object):
         :param kernel_size:
         """
         # TODO Consider using default values in function signature.
-        self.model_id = model_id
+        self.model_id = self.__id_generator(6)
         self.n_epochs = n_epochs
         self.n_dense_layers = n_dense_layers
         self.dense_scaling = dense_scaling
@@ -37,6 +39,10 @@ class ModelParameters(object):
         self.grid_size = self.out_dense_2 * n_dense_layers - kernel_size + 1
 
         # TODO Give feedback about parameter settings (especially grid_size).
+
+    @staticmethod
+    def __id_generator(size=6, chars=string.ascii_uppercase + string.digits):
+        return ''.join(random.choice(chars) for _ in range(size))
 
     def get_params(self):
         """
