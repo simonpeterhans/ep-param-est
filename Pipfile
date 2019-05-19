@@ -9,7 +9,7 @@ verify_ssl = true
 numpy = "*"
 keras = "*"
 pandas = "*"
-tensorflow = "*"
+tensorflow-gpu = "*"
 pydot = "*"
 
 [requires]
