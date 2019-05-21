@@ -2,16 +2,20 @@ import random
 import string
 from abc import abstractmethod
 
+import keras
 import pandas as pd
-from keras import Model, Input
+from keras import Input
 from keras import backend
 from keras.callbacks import Callback
 from keras.layers import Dense, Concatenate, Reshape, Conv2D, Lambda
 
 
-class ModelParameters(object):
+class Model(keras.Model):
     """
-    Class to store the model parameters in.
+    Keras model that also holds the parameter values as attributes and generates the following
+    structure upon initialization.
+
+    TODO MODEL STRUCTURE/DESCRIPTION
     """
 
     def __init__(self, n_samples, n_epochs, batch_size, desired_grid_size, n_dense_layers,
@@ -35,8 +39,7 @@ class ModelParameters(object):
         length 6 is generated and used as name instead.
         """
         # TODO Consider using default values in function signature.
-        if name is None:
-            self.name = self.__id_generator(6)
+        super().__init__()
 
         self.n_samples = n_samples
         self.n_epochs = n_epochs
@@ -50,7 +53,67 @@ class ModelParameters(object):
         self.out_dense_2 = (desired_grid_size + kernel_size - 1) // n_dense_layers
         self.grid_size = self.out_dense_2 * n_dense_layers - kernel_size + 1
 
+        if name is None:
+            self.name = self.__id_generator(6)
+
+        self.__create_model()
+
         # TODO Give feedback about parameter settings (especially grid_size).
+
+    def params_to_df(self):
+        """
+        Creates a pandas data frame of the set of parameters which are not inherited from
+        keras.Model.
+        As of now, we don't care about reloading the model parameters.
+
+        :return: The created data frame.
+        """
+        # TODO Try to find a nicer way to do this.
+        select = {'name': self.name,
+                  'n_samples': self.n_samples,
+                  'grid_size': self.grid_size,
+                  'n_epochs': self.n_epochs,
+                  'batch_size': self.batch_size,
+                  'n_dense_layers': self.n_dense_layers,
+                  'dense_scaling': self.dense_scaling,
+                  'depth': self.depth,
+                  'n_kernels': self.n_kernels,
+                  'kernel_size': self.kernel_size,
+                  'out_dense_2': self.out_dense_2
+                  }
+
+        return pd.DataFrame.from_records([select], columns=select.keys())
+
+    def __create_model(self):
+        """
+        Creates the model to predict the likelihood function when given parameters of a
+        distribution.
+        """
+        input_layer = Input(shape=(2,), name='input')
+
+        dense_1, dense_2, dense_reshape = [], [], []
+
+        for i in range(self.n_dense_layers):
+            dense_1.append(Dense(self.dense_scaling * self.depth, activation='relu',
+                                 name='level_1_dense_{:02d}'.format(i))(input_layer))
+
+            dense_2.append(Dense(self.out_dense_2 * self.depth, activation='relu',
+                                 name='level_2_dense_{:02d}'.format(i))(dense_1[-1]))
+
+            dense_reshape.append(
+                Reshape(target_shape=(self.out_dense_2, self.depth, 1))(dense_2[-1]))
+
+        concat = Concatenate(axis=-1)(dense_reshape)
+        dense_reshape = Reshape(
+            target_shape=(self.grid_size + self.kernel_size - 1, self.depth, 1))(concat)
+
+        conv = Conv2D(filters=self.n_kernels, kernel_size=(self.kernel_size, self.depth),
+                      strides=1)(dense_reshape)
+
+        avg = Lambda(lambda x: backend.sum(x, axis=-1), output_shape=lambda d: (d[0], d[1]))(conv)
+        avg_reshape = Reshape(target_shape=(self.grid_size,))(avg)
+
+        super().__init__(input_layer, avg_reshape)
 
     @staticmethod
     def __id_generator(size=6, chars=string.ascii_uppercase + string.digits):
@@ -64,13 +127,18 @@ class ModelParameters(object):
         """
         return ''.join(random.choice(chars) for _ in range(size))
 
-    def to_df(self):
-        """
-        Creates a pandas data frame of the set of parameters and their values.
 
-        :return: The created data frame.
-        """
-        return pd.DataFrame.from_records([vars(self)], columns=vars(self).keys())
+class LossHistory(Callback):
+    """
+    Loss history object to record the development of the loss value during training after every
+    epoch.
+    """
+
+    def on_train_begin(self, logs={}):
+        self.losses = []
+
+    def on_epoch_end(self, epoch, logs={}):
+        self.losses.append(logs.get('loss'))
 
 
 class Distribution(object):
@@ -115,51 +183,3 @@ class Distribution(object):
         :return: The created data frame.
         """
         return pd.DataFrame.from_records([vars(self)], columns=vars(self).keys())
-
-
-class LossHistory(Callback):
-    """
-    Loss history object to record the development of the loss value during training;
-    as of now, the loss is recorded after every epoch.
-    """
-
-    def on_train_begin(self, logs={}):
-        self.losses = []
-
-    def on_epoch_end(self, epoch, logs={}):
-        self.losses.append(logs.get('loss'))
-
-
-def create_model(p):
-    """
-    Creates the model to predict the likelihood function when given parameters of a distribution.
-
-    :type p: ModelParameters
-    :param p: A parameter object to specify the parameters of this model.
-    :return: The created (uncompiled) model.
-    """
-    model = Input(shape=(2,), name='input')
-
-    dense_1, dense_2, dense_reshape = [], [], []
-
-    for i in range(p.n_dense_layers):
-        dense_1.append(Dense(p.dense_scaling * p.depth, activation='relu',
-                             name='level_1_dense_{:02d}'.format(i))(model))
-
-        dense_2.append(Dense(p.out_dense_2 * p.depth, activation='relu',
-                             name='level_2_dense_{:02d}'.format(i))(dense_1[-1]))
-
-        dense_reshape.append(Reshape(target_shape=(p.out_dense_2, p.depth, 1))(dense_2[-1]))
-
-    concat = Concatenate(axis=-1)(dense_reshape)
-    dense_reshape = Reshape(target_shape=(p.grid_size + p.kernel_size - 1, p.depth, 1))(concat)
-
-    conv = Conv2D(filters=p.n_kernels, kernel_size=(p.kernel_size, p.depth), strides=1)(
-        dense_reshape)
-
-    avg = Lambda(lambda x: backend.sum(x, axis=-1), output_shape=lambda d: (d[0], d[1]))(conv)
-    avg_reshape = Reshape(target_shape=(p.grid_size,))(avg)
-
-    model = Model(model, avg_reshape)
-
-    return model

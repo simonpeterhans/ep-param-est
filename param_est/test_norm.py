@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from keras.utils import plot_model
 
-from core import ModelParameters, create_model, LossHistory
+from core import LossHistory, Model
 from norm import NormalDistribution
 
 test_name = 'norm'
@@ -53,31 +53,29 @@ loss_list = []
 for thetas, desired_grid_size in combinations:
     # TODO Consider wrapping the whole keras model and its method in a class.
     # Create model parameters and add to list.
-    p = ModelParameters(thetas, n_epochs, batch_size, desired_grid_size, n_dense_layers,
-                        dense_scaling, depth, n_kernels, kernel_size)
-    p.name = str(thetas) + '-' + str(p.grid_size)
-    param_list.append(p.to_df())
-
-    model = create_model(p)
+    model = Model(thetas, n_epochs, batch_size, desired_grid_size, n_dense_layers,
+                  dense_scaling, depth, n_kernels, kernel_size)
+    model.name = str(model.n_samples) + '-' + str(model.grid_size)
+    param_list.append(model.params_to_df())
 
     model.compile(optimizer='adam', loss='mean_squared_error')
-    plot_model(model, show_shapes=True, to_file=os.path.join(path, p.name + '-plot.png'))
+    plot_model(model, show_shapes=True, to_file=os.path.join(path, model.name + '-plot.png'))
 
     # Create distribution and add to list.
-    nd = NormalDistribution(p.name, x_min, x_max, mu_min, mu_max, sigma_min, sigma_max)
+    nd = NormalDistribution(model.name, x_min, x_max, mu_min, mu_max, sigma_min, sigma_max)
     dist_list.append(nd.to_df())
-    sampled_params, sampled_grid = nd.gen_data(thetas, p.grid_size)
+    sampled_params, sampled_grid = nd.gen_data(model.n_samples, model.grid_size)
 
     history = LossHistory()
 
-    model.fit(sampled_params, sampled_grid, shuffle=True, batch_size=p.batch_size,
-              epochs=p.n_epochs, callbacks=[history])
-    """model.fit_generator(nd.gen_fun(p.batch_size, p.grid_size),
-                        steps_per_epoch=np.ceil(thetas / p.batch_size), shuffle=True,
-                        epochs=p.n_epochs, callbacks=[history]"""
-    model.save(os.path.join(path, p.name + '-model.h5'))
+    model.fit(sampled_params, sampled_grid, shuffle=True, batch_size=model.batch_size,
+              epochs=model.n_epochs, callbacks=[history])
+    model.fit_generator(nd.gen_fun(model.batch_size, model.grid_size),
+                        steps_per_epoch=np.ceil(model.n_samples / model.batch_size), shuffle=True,
+                        epochs=model.n_epochs, callbacks=[history])
+    model.save(os.path.join(path, model.name + '-model.h5'))
 
-    loss_list.append(pd.DataFrame(history.losses, columns=[p.name]))
+    loss_list.append(pd.DataFrame(history.losses, columns=[model.name]))
 
     # TODO Append number of sampled thetas to the parameter table.
     pd.concat(param_list, ignore_index=True).to_csv(path + '-params.csv')

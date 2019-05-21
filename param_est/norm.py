@@ -50,7 +50,7 @@ class NormalDistribution(Distribution):
 
         return sampled_params, sampled_grid
 
-    def gen_fun(self, n_params_samples, grid_size_per_sample):
+    def gen_fun(self, n_param_samples, grid_size_per_sample):
         """
         Generator function for this distribution to dynamically generate (yield) data.
 
@@ -59,6 +59,6 @@ class NormalDistribution(Distribution):
         vectors, i.e., the grid size.
         :return: The sampled parameters and the grid sampled from the sampled parameters.
         """
+        # TODO This could potentially be in the parent class.
         while 1:
-            # TODO This could potentially be in the parent class.
-            yield self.gen_data(n_params_samples, grid_size_per_sample)
+            yield self.gen_data(n_param_samples, grid_size_per_sample)
