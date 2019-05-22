@@ -8,6 +8,7 @@ from keras import Input
 from keras import backend
 from keras.callbacks import Callback
 from keras.layers import Dense, Concatenate, Reshape, Conv2D, Lambda
+from keras.utils import plot_model
 
 
 class Model(keras.Model):
@@ -83,6 +84,14 @@ class Model(keras.Model):
                   }
 
         return pd.DataFrame.from_records([select], columns=select.keys())
+
+    def plot(self, **kwargs):
+        """
+        TBA
+        :param kwargs:
+        :return:
+        """
+        plot_model(self, **kwargs)
 
     def __create_model(self):
         """
