@@ -1,5 +1,3 @@
-import random
-import string
 from abc import abstractmethod
 
 import keras
@@ -19,17 +17,17 @@ class Model(keras.Model):
     TODO MODEL STRUCTURE/DESCRIPTION
     """
 
-    def __init__(self, n_samples, n_epochs, batch_size, desired_grid_size, n_dense_layers,
+    def __init__(self, n_samples, desired_grid_size, n_epochs, batch_size, n_dense_layers,
                  dense_scaling, depth, n_kernels, kernel_size, name=None):
         """
         Sets the initial values for the parameters. Calculates out_dense_2 and adjusts
         desired_grid_size to grid_size so the model dimensions are correct.
 
         :param n_samples: Total number of samples to train this network on.
-        :param n_epochs: Number of epochs to use when using this parameters on training a model.
-        :param batch_size: Batch size.
         :param desired_grid_size: Desired size of the grid; may get adjusted and is available as
         grid_size.
+        :param n_epochs: Number of epochs to use when using this parameters on training a model.
+        :param batch_size: Batch size.
         :param n_dense_layers: Number of dense layers per first and second level.
         :param dense_scaling: Scaling for the number of neurons in the first dense layer
         (dense_scaling * depth)
@@ -53,9 +51,6 @@ class Model(keras.Model):
 
         self.out_dense_2 = (desired_grid_size + kernel_size - 1) // n_dense_layers
         self.grid_size = self.out_dense_2 * n_dense_layers - kernel_size + 1
-
-        if name is None:
-            self.name = self.__id_generator(6)
 
         self.__create_model()
 
@@ -103,7 +98,7 @@ class Model(keras.Model):
         dense_1, dense_2, dense_reshape = [], [], []
 
         for i in range(self.n_dense_layers):
-            dense_1.append(Dense(self.dense_scaling * self.depth, activation='relu',
+            dense_1.append(Dense(int(self.dense_scaling * self.depth), activation='relu',
                                  name='level_1_dense_{:02d}'.format(i))(input_layer))
 
             dense_2.append(Dense(self.out_dense_2 * self.depth, activation='relu',
@@ -123,18 +118,6 @@ class Model(keras.Model):
         avg_reshape = Reshape(target_shape=(self.grid_size,))(avg)
 
         super().__init__(input_layer, avg_reshape)
-
-    @staticmethod
-    def __id_generator(size=6, chars=string.ascii_uppercase + string.digits):
-        """
-        Used to generate a random ID for the model so we can identify it (usually it's smarter to
-        manually set a name).
-
-        :param size: Length of the id.
-        :param chars: Selection of the characters to use, defaults to upper-case letters and digits.
-        :return: The generated string.
-        """
-        return ''.join(random.choice(chars) for _ in range(size))
 
 
 class LossHistory(Callback):

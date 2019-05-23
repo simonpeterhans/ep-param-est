@@ -19,7 +19,7 @@ if not os.path.exists(path):
     os.makedirs(path)
 
 # TODO Implement proper logging.
-logging.basicConfig(filename=test_name + '.log', level=logging.INFO)
+logging.basicConfig(filename=path + '-output.log', level=logging.NOTSET)
 
 # Parameter settings and number of samples per sampled parameter vector.
 n_param_vectors = [150000]
@@ -53,7 +53,7 @@ loss_list = []
 for thetas, desired_grid_size in combinations:
     # TODO Consider wrapping the whole keras model and its method in a class.
     # Create model parameters and add to list.
-    model = Model(thetas, n_epochs, batch_size, desired_grid_size, n_dense_layers,
+    model = Model(thetas, desired_grid_size, n_epochs, batch_size, n_dense_layers,
                   dense_scaling, depth, n_kernels, kernel_size)
     model.name = str(model.n_samples) + '-' + str(model.grid_size)
     param_list.append(model.params_to_df())
