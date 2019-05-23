@@ -57,11 +57,11 @@ def parse_args():
 
     parser.add_argument('--dist', metavar='name', default='norm', type=str, required=True,
                         help='the distribution to sample the grid from')
-    parser.add_argument('--dist-args', metavar='par', nargs='*',
+    parser.add_argument('--dist-args', metavar='par', nargs='*', type=float, required=True,
                         help='the parameters for the selected distribution')
     parser.add_argument('--n-samples', metavar='n', default=1000000, type=int,
                         help='number of samples to train the model on')
-    parser.add_argument('--grid-size', metavar='x', default=500, type=int,
+    parser.add_argument('--grid-size', metavar='x', default=250, type=int,
                         help='the size of the grid')
     parser.add_argument('--epochs', metavar='n', default=50, type=int, help='number of epochs')
     parser.add_argument('--batch-size', metavar='x', type=int, default=64, help='number of batches')
