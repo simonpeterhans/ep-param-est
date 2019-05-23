@@ -2,36 +2,89 @@ import os
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from datetime import datetime
 
-parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter, epilog='tba')
+from core import Model, LossHistory
+from norm import NormalDistribution
 
-parser.add_argument('--dist', metavar='name', default='norm', type=str, required=True,
-                    help='the distribution to sample the grid from')
-parser.add_argument('--dist-args', metavar='par', nargs='*',
-                    help='the parameters for the selected distribution')
-parser.add_argument('--n-samples', metavar='n', default=1000000,
-                    help='number of samples to train the model on')
-parser.add_argument('--grid-size', metavar='x', default=500, help='the size of the grid')
-parser.add_argument('--epochs', metavar='n', default=50, help='number of epochs')
-parser.add_argument('--batch-size', metavar='x', default=64, help='number of batches')
-parser.add_argument('--dense-layers', metavar='n', default=25,
-                    help='number of dense layers per level')
-parser.add_argument('--dense-factor', metavar='f', default=1.0,
-                    help='scaling of the first dense layer level')
-parser.add_argument('--depth', metavar='x', default=25, help='depth of the model')
-parser.add_argument('--kernels', metavar='n', default=25, help='number of kernels to use')
-parser.add_argument('--kernel-size', metavar='x', default=25, help='size of the kernels')
-parser.add_argument('--store-params', action='store_true', help='saves the parameters used')
-parser.add_argument('--store-model', action='store_true', help='saves the model')
-parser.add_argument('--plot-model', action='store_true', help='saves the model as a .png file')
 
-args = parser.parse_args()
-
-# TODO This is probably redundant?
-if __name__ == '__main__':
+def main(args):
+    """
+    TBA
+    :param args:
+    :return:
+    """
     now = datetime.now().strftime("%Y%m%d%H%M%S")
-    run_name = args.dist
 
-    # TODO Decide where to store output.
-    path = os.path.join(os.getcwd(), 'output', run_name + '-' + now)
+    path = os.path.join(os.getcwd(), 'output', args.name + '-' + now)
 
-    # create_run() ...
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+    model = Model(args.n_samples, args.grid_size, args.epochs, args.batch_size, args.dense_layers,
+                  args.dense_factor, args.depth, args.kernels, args.kernel_size, args.name)
+
+    model.compile(optimizer='adam', loss='mean_squared_error')
+
+    if args.plot_model:
+        model.plot(show_shapes=True, to_file=os.path.join(path, 'model-plot.png'))
+
+    if args.dist == 'norm':
+        dist = NormalDistribution(args.name, *args.dist_args)
+    else:  # TODO Handle this.
+        dist = NormalDistribution(args.name, *args.dist_args)
+
+    sampled_params, sampled_grid = dist.gen_data(model.n_samples, model.grid_size)
+
+    history = LossHistory()
+    model.fit(sampled_params, sampled_grid, shuffle=True, batch_size=model.batch_size,
+              epochs=model.n_epochs, callbacks=[history])
+    """model.fit_generator(dist.gen_fun(model.batch_size, model.grid_size),
+                        steps_per_epoch=np.ceil(model.n_samples / model.batch_size), shuffle=True,
+                        epochs=model.n_epochs, callbacks=[history])"""
+
+    model.save(os.path.join(path, 'model.h5'))
+
+    # TODO Export loss, model params and dist params to csv.
+    dist.to_df()
+    model.params_to_df()
+
+
+def parse_args():
+    """
+    TBA
+    :return:
+    """
+    parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter, epilog='tba')
+
+    parser.add_argument('--dist', metavar='name', default='norm', type=str, required=True,
+                        help='the distribution to sample the grid from')
+    parser.add_argument('--dist-args', metavar='par', nargs='*',
+                        help='the parameters for the selected distribution')
+    parser.add_argument('--n-samples', metavar='n', default=1000000, type=int,
+                        help='number of samples to train the model on')
+    parser.add_argument('--grid-size', metavar='x', default=500, type=int,
+                        help='the size of the grid')
+    parser.add_argument('--epochs', metavar='n', default=50, type=int, help='number of epochs')
+    parser.add_argument('--batch-size', metavar='x', type=int, default=64, help='number of batches')
+    parser.add_argument('--dense-layers', metavar='n', type=int, default=25,
+                        help='number of dense layers per level')
+    parser.add_argument('--dense-factor', metavar='f', type=float, default=1.0,
+                        help='scaling of the first dense layer level')
+    parser.add_argument('--depth', metavar='x', default=25, type=int, help='depth of the model')
+    parser.add_argument('--kernels', metavar='n', default=25, type=int,
+                        help='number of kernels to use')
+    parser.add_argument('--kernel-size', metavar='x', default=25, type=int,
+                        help='size of the kernels')
+    parser.add_argument('--name', metavar='modelname', type=str,
+                        help='if not set, the name will be deduced from the distribution used')
+    parser.add_argument('--plot-model', action='store_true', help='saves the model as a .png file')
+
+    args = parser.parse_args()
+
+    if args.name is None:
+        args.name = args.dist
+
+    return args
+
+
+if __name__ == '__main__':
+    main(parse_args())
