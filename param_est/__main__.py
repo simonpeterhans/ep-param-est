@@ -13,8 +13,10 @@ def main(args):
     :param args:
     :return:
     """
-    now = datetime.now().strftime("%Y%m%d%H%M%S")
+    if args.name is None:
+        args.name = args.dist
 
+    now = datetime.now().strftime("%Y%m%d%H%M%S")
     path = os.path.join(os.getcwd(), 'output', args.name + '-' + now)
 
     if not os.path.exists(path):
@@ -22,7 +24,6 @@ def main(args):
 
     model = Model(args.n_samples, args.grid_size, args.epochs, args.batch_size, args.dense_layers,
                   args.dense_factor, args.depth, args.kernels, args.kernel_size, args.name)
-
     model.compile(optimizer='adam', loss='mean_squared_error')
 
     if args.plot_model:
@@ -43,10 +44,9 @@ def main(args):
 
     # Export files.
     model.save(os.path.join(path, 'model.h5'))
-    dist.to_csv(os.path.join(path, 'dist-params.csv'))
-    model.params_to_csv(os.path.join(path, 'model-params.csv'))
     model.loss_to_csv(os.path.join(path, 'loss.csv'))
-
+    model.params_to_csv(os.path.join(path, 'model-params.csv'))
+    dist.to_csv(os.path.join(path, 'dist-params.csv'))
 
 
 def parse_args():
@@ -63,9 +63,9 @@ def parse_args():
                         help='the parameters for the selected distribution')
     parser.add_argument('--n-samples', metavar='n', default=100000, type=int,
                         help='number of samples to train the model on')
-    parser.add_argument('--grid-size', metavar='x', default=100, type=int,
+    parser.add_argument('--grid-size', metavar='x', default=150, type=int,
                         help='the size of the grid')
-    parser.add_argument('--epochs', metavar='n', default=2, type=int, help='number of epochs')
+    parser.add_argument('--epochs', metavar='n', default=50, type=int, help='number of epochs')
     parser.add_argument('--batch-size', metavar='x', type=int, default=64, help='number of batches')
     parser.add_argument('--dense-layers', metavar='n', type=int, default=25,
                         help='number of dense layers per level')
@@ -80,10 +80,9 @@ def parse_args():
                         help='if not set, the name will be deduced from the distribution used')
     parser.add_argument('--plot-model', action='store_true', help='saves the model as a .png file')
 
-    args = parser.parse_args()
+    # TODO Add the option to generate data on the fly.
 
-    if args.name is None:
-        args.name = args.dist
+    args = parser.parse_args()
 
     return args
 

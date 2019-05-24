@@ -23,6 +23,10 @@ class Model(keras.Model):
         epoch.
         """
 
+        def __init__(self):
+            super().__init__()
+            self.history = None
+
         def on_train_begin(self, logs={}):
             self.losses = []
 
