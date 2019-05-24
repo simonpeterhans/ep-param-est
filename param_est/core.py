@@ -17,6 +17,18 @@ class Model(keras.Model):
     TODO MODEL STRUCTURE/DESCRIPTION
     """
 
+    class LossHistory(Callback):
+        """
+        Loss history object to record the development of the loss value during training after every
+        epoch.
+        """
+
+        def on_train_begin(self, logs={}):
+            self.losses = []
+
+        def on_epoch_end(self, epoch, logs={}):
+            self.losses.append(logs.get('loss'))
+
     def __init__(self, n_samples, desired_grid_size, n_epochs, batch_size, n_dense_layers,
                  dense_scaling, depth, n_kernels, kernel_size, name=None):
         """
@@ -40,6 +52,7 @@ class Model(keras.Model):
         # TODO Consider using default values in function signature.
         super().__init__()
 
+        self.model_name = name
         self.n_samples = n_samples
         self.n_epochs = n_epochs
         self.batch_size = batch_size
@@ -52,20 +65,31 @@ class Model(keras.Model):
         self.out_dense_2 = (desired_grid_size + kernel_size - 1) // n_dense_layers
         self.grid_size = self.out_dense_2 * n_dense_layers - kernel_size + 1
 
+        self.history = self.LossHistory()
+
         self.__create_model()
 
         # TODO Give feedback about parameter settings (especially grid_size).
 
-    def params_to_df(self):
+    def loss_to_csv(self, path):
+        """
+        TBA
+
+        :param path:
+        :return:
+        """
+        pd.DataFrame(self.history.history['loss'], columns=[self.model_name]).to_csv(path)
+
+    def params_to_csv(self, path):
         """
         Creates a pandas data frame of the set of parameters which are not inherited from
-        keras.Model.
-        As of now, we don't care about reloading the model parameters.
+        keras.Model and stores the data frame in a .csv file.
 
-        :return: The created data frame.
+        :param path: The path to the .csv file to create.
+        :return:
         """
         # TODO Try to find a nicer way to do this.
-        select = {'name': self.name,
+        select = {'name': self.model_name,
                   'n_samples': self.n_samples,
                   'grid_size': self.grid_size,
                   'n_epochs': self.n_epochs,
@@ -78,11 +102,13 @@ class Model(keras.Model):
                   'out_dense_2': self.out_dense_2
                   }
 
-        return pd.DataFrame.from_records([select], columns=select.keys())
+        df = pd.DataFrame.from_records([select], columns=select.keys())
+        df.to_csv(path)
 
     def plot(self, **kwargs):
         """
         TBA
+
         :param kwargs:
         :return:
         """
@@ -120,19 +146,6 @@ class Model(keras.Model):
         super().__init__(input_layer, avg_reshape)
 
 
-class LossHistory(Callback):
-    """
-    Loss history object to record the development of the loss value during training after every
-    epoch.
-    """
-
-    def on_train_begin(self, logs={}):
-        self.losses = []
-
-    def on_epoch_end(self, epoch, logs={}):
-        self.losses.append(logs.get('loss'))
-
-
 class Distribution(object):
     """
     Abstract class for distribution objects.
@@ -168,10 +181,13 @@ class Distribution(object):
         """
         raise NotImplementedError
 
-    def to_df(self):
+    def to_csv(self, file):
         """
-        Creates a pandas data frame of the set of parameters and their values.
+        Creates a pandas data frame of the set of parameters and their values and stores the data
+        frame in a .csv file.
 
-        :return: The created data frame.
+        :param file: The path to the .csv file to create.
+        :return:
         """
-        return pd.DataFrame.from_records([vars(self)], columns=vars(self).keys())
+        df = pd.DataFrame.from_records([vars(self)], columns=vars(self).keys())
+        df.to_csv(file)
