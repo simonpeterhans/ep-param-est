@@ -53,7 +53,6 @@ class Model(keras.Model):
         :param name: Can be set on initialization or afterwards. If not set, a random string of
         length 6 is generated and used as name instead.
         """
-        # TODO Consider using default values in function signature.
         super().__init__()
 
         self.model_name = name
@@ -77,10 +76,10 @@ class Model(keras.Model):
 
     def loss_to_csv(self, path):
         """
-        TBA
+        Creates a pandas data frame of the loss values obtained during the training and stores the
+        data frame in a .csv file.
 
-        :param path:
-        :return:
+        :param path: The path to the .csv file to create.
         """
         pd.DataFrame(self.history.history['loss'], columns=[self.model_name]).to_csv(path)
 
@@ -90,9 +89,7 @@ class Model(keras.Model):
         keras.Model and stores the data frame in a .csv file.
 
         :param path: The path to the .csv file to create.
-        :return:
         """
-        # TODO Try to find a nicer way to do this.
         select = {'name': self.model_name,
                   'n_samples': self.n_samples,
                   'grid_size': self.grid_size,
@@ -111,10 +108,9 @@ class Model(keras.Model):
 
     def plot(self, **kwargs):
         """
-        TBA
+        Wrapper method for the plot_model method. TODO Add reference to doc from plot_model.
 
-        :param kwargs:
-        :return:
+        :param kwargs: The arguments to pass on to plot_model.
         """
         plot_model(self, **kwargs)
 
@@ -191,7 +187,6 @@ class Distribution(object):
         frame in a .csv file.
 
         :param file: The path to the .csv file to create.
-        :return:
         """
         df = pd.DataFrame.from_records([vars(self)], columns=vars(self).keys())
         df.to_csv(file)
