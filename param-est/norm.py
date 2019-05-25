@@ -33,7 +33,8 @@ class NormalDistribution(Distribution):
 
     def gen_data(self, n_param_samples, grid_size_per_sample):
         """
-        Abstract method to generate data.
+        Samples mu and sigma from an uniform distribution and then samples data from these
+        parameters from a normal distribution.
 
         :param n_param_samples: Number of thetas (parameter vectors) to generate.
         :param grid_size_per_sample: Number of samples to generate from the generated parameter

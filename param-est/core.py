@@ -50,8 +50,7 @@ class Model(keras.Model):
         :param depth: Model depth.
         :param n_kernels: Number of kernels to use.
         :param kernel_size: Size of the kernels.
-        :param name: Can be set on initialization or afterwards. If not set, a random string of
-        length 6 is generated and used as name instead.
+        :param name: Can be set on initialization or afterwards.
         """
         super().__init__()
 
@@ -90,18 +89,19 @@ class Model(keras.Model):
 
         :param path: The path to the .csv file to create.
         """
-        select = {'name': self.model_name,
-                  'n_samples': self.n_samples,
-                  'grid_size': self.grid_size,
-                  'n_epochs': self.n_epochs,
-                  'batch_size': self.batch_size,
-                  'n_dense_layers': self.n_dense_layers,
-                  'dense_scaling': self.dense_scaling,
-                  'depth': self.depth,
-                  'n_kernels': self.n_kernels,
-                  'kernel_size': self.kernel_size,
-                  'out_dense_2': self.out_dense_2
-                  }
+        select = {
+            'name': self.model_name,
+            'n_samples': self.n_samples,
+            'grid_size': self.grid_size,
+            'n_epochs': self.n_epochs,
+            'batch_size': self.batch_size,
+            'n_dense_layers': self.n_dense_layers,
+            'dense_scaling': self.dense_scaling,
+            'depth': self.depth,
+            'n_kernels': self.n_kernels,
+            'kernel_size': self.kernel_size,
+            'out_dense_2': self.out_dense_2
+        }
 
         df = pd.DataFrame.from_records([select], columns=select.keys())
         df.to_csv(path)
