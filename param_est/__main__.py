@@ -4,8 +4,8 @@ from datetime import datetime
 
 import numpy as np
 
-from core import Model
-from norm import NormalDistribution
+from .core import Model
+from .norm import NormalDistribution
 
 
 def main(args):
