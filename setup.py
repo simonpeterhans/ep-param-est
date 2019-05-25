@@ -1,12 +1,16 @@
+import os
+
 from setuptools import setup, find_packages
 
-with open('README.md') as f:
+setup_dir = os.path.dirname(os.path.abspath(__file__))
+
+with open(os.path.join(setup_dir, 'README.md')) as f:
     readme = f.read()
 
-with open('LICENSE') as f:
+with open(os.path.join(setup_dir, 'LICENSE')) as f:
     lic = f.read()
 
-with open('requirements.txt') as f:
+with open(os.path.join(setup_dir, 'requirements.txt')) as f:
     reqs = f.read().splitlines()
 
 setup(
