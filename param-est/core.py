@@ -108,7 +108,7 @@ class Model(keras.Model):
 
     def plot(self, **kwargs):
         """
-        Wrapper method for the plot_model method. TODO Add reference to doc from plot_model.
+        Wrapper method for the plot_model method from keras.utils for convenience.
 
         :param kwargs: The arguments to pass on to plot_model.
         """

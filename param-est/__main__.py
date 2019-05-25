@@ -9,6 +9,11 @@ from .norm import NormalDistribution
 
 
 def main(args):
+    """
+    Example of how the module can be used.
+
+    :param args: The arguments passed upon calling the module.
+    """
     if args.name is None:
         args.name = args.dist
 
@@ -28,8 +33,10 @@ def main(args):
 
     if args.dist == 'norm':
         dist = NormalDistribution(args.name, *args.dist_args)
-    else:  # TODO Handle this.
-        dist = NormalDistribution(args.name, *args.dist_args)
+    else:
+        dist = None  # Silences warning.
+        print("Distribution " + args.dist + " doesn't exist - terminating.")
+        exit(-1)
     dist.to_csv(os.path.join(path, 'dist-params.csv'))
 
     sampled_params, sampled_grid = dist.gen_data(model.n_samples, model.grid_size)
