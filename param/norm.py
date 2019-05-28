@@ -1,7 +1,7 @@
 import numpy as np
 from scipy import stats as ss
 
-from core import Distribution
+from param.core import Distribution
 
 
 class NormalDistribution(Distribution):
