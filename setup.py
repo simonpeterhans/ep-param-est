@@ -14,7 +14,7 @@ with open(os.path.join(setup_dir, 'requirements.txt')) as f:
     reqs = f.read().splitlines()
 
 setup(
-    name='param-est',
+    name='param',
     version='0.0.0',
     description='tba',
     long_description=readme,
