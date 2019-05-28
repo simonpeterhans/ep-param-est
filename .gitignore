@@ -1,5 +1,10 @@
+# Distribution.
+build/
+dist/
+*.egg-info/
+
 # Output from code (currently used for testing).
-#output/
+output/
 
 # IntelliJ.
 .idea/
