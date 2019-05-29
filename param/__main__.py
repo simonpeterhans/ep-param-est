@@ -25,15 +25,18 @@ def main(args):
     model.params_to_csv(os.path.join(path, 'model-params.csv'))
     model.compile(optimizer='adam', loss='mean_squared_error')
 
-    if args.plot_model:
+    if args.plot_model or args.preview:
         model.plot(show_shapes=True, to_file=os.path.join(path, 'model-plot.png'))
+
+    if args.preview:
+        exit(0)
 
     if args.dist == 'norm':
         dist = NormalDistribution(args.name, *args.dist_args)
     else:
         dist = None  # Silences warning.
         print("Distribution " + args.dist + " doesn't exist - terminating.")
-        exit(-1)
+        exit(1)
     dist.to_csv(os.path.join(path, 'dist-params.csv'))
 
     sampled_params, sampled_grid = dist.gen_data(model.n_samples, model.grid_size)
@@ -53,7 +56,9 @@ def main(args):
 def parse_args():
     parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter, epilog='tba')
 
-    parser.add_argument('--dist', metavar='name', default='norm', type=str, required=True,
+    parser.add_argument('--preview', action='store_true',
+                        help='compiles and plots model, stores parameters, but no actual training')
+    parser.add_argument('--dist', metavar='d', default='norm', type=str, required=True,
                         help='the distribution to sample the grid from')
     parser.add_argument('--dist-args', metavar='par', nargs='*', type=float, required=True,
                         help='the parameters for the selected distribution')
@@ -74,7 +79,7 @@ def parse_args():
                         help='number of kernels to use')
     parser.add_argument('--kernel-size', metavar='x', default=25, type=int,
                         help='size of the kernels')
-    parser.add_argument('--name', metavar='modelname', type=str,
+    parser.add_argument('--name', metavar='n', type=str,
                         help='if not set, the name will be deduced from the distribution used')
     parser.add_argument('--path', metavar='p', default='~/output', type=str,
                         help='path to store the output in; ~/output/ used if not set')
