@@ -4,7 +4,7 @@ import keras
 import pandas as pd
 from keras import Input
 from keras import backend as K
-from keras.callbacks import Callback
+from keras.callbacks import History
 from keras.layers import Dense, Concatenate, Reshape, Conv2D, Lambda
 from keras.utils import plot_model
 
@@ -16,22 +16,6 @@ class Model(keras.Model):
 
     TODO MODEL STRUCTURE/DESCRIPTION
     """
-
-    class LossHistory(Callback):
-        """
-        Loss history object to record the development of the loss value during training after every
-        epoch.
-        """
-
-        def __init__(self):
-            super().__init__()
-            self.history = None
-
-        def on_train_begin(self, logs={}):
-            self.losses = []
-
-        def on_epoch_end(self, epoch, logs={}):
-            self.losses.append(logs.get('loss'))
 
     def __init__(self, n_samples, desired_grid_size, n_epochs, batch_size, n_dense_layers,
                  dense_scaling, depth, n_kernels, kernel_size, name=None):
@@ -70,7 +54,7 @@ class Model(keras.Model):
         print("Calculated parameters:", "out_dense_2 =", self.out_dense_2, ", grid_size =",
               self.grid_size)
 
-        self.history = self.LossHistory()
+        self.history = History()
 
         self.__create_model()
 
