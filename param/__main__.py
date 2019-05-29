@@ -5,7 +5,7 @@ from datetime import datetime
 import numpy as np
 
 from param.core import Model
-from param.norm import NormalDistribution
+from param.dists.norm import NormalDistribution
 
 
 def main(args):
