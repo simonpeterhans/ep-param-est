@@ -3,7 +3,7 @@ from abc import abstractmethod
 import keras
 import pandas as pd
 from keras import Input
-from keras import backend
+from keras import backend as K
 from keras.callbacks import Callback
 from keras.layers import Dense, Concatenate, Reshape, Conv2D, Lambda
 from keras.utils import plot_model
@@ -66,6 +66,9 @@ class Model(keras.Model):
 
         self.out_dense_2 = (desired_grid_size + kernel_size - 1) // n_dense_layers
         self.grid_size = self.out_dense_2 * n_dense_layers - kernel_size + 1
+
+        print("Calculated parameters:", "out_dense_2 =", self.out_dense_2, ", grid_size =",
+              self.grid_size)
 
         self.history = self.LossHistory()
 
@@ -140,7 +143,7 @@ class Model(keras.Model):
         conv = Conv2D(filters=self.n_kernels, kernel_size=(self.kernel_size, self.depth),
                       strides=1)(dense_reshape)
 
-        avg = Lambda(lambda x: backend.sum(x, axis=-1), output_shape=lambda d: (d[0], d[1]))(conv)
+        avg = Lambda(lambda x: K.sum(x, axis=-1), output_shape=lambda d: (d[0], d[1]))(conv)
         avg_reshape = Reshape(target_shape=(self.grid_size,))(avg)
 
         super().__init__(input_layer, avg_reshape)
