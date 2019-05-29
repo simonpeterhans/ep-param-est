@@ -53,8 +53,8 @@ def main(args):
     model.loss_to_csv(os.path.join(path, 'loss.csv'))
 
 
-def parse_args():
-    parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter, epilog='tba')
+def parse_args():  # TODO Add epilog with detailed description.
+    parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter, epilog='')
 
     parser.add_argument('--preview', action='store_true',
                         help='compiles and plots model, stores parameters, but no actual training')
@@ -64,11 +64,11 @@ def parse_args():
                         help='the parameters for the selected distribution')
     parser.add_argument('--gen-mode', action='store_true',
                         help='generates data on the fly; --n-samples samples generated per epoch')
-    parser.add_argument('--n-samples', metavar='n', default=100000, type=int,
+    parser.add_argument('--n-samples', metavar='n', default=500000, type=int,
                         help='number of samples to train the model on')
-    parser.add_argument('--grid-size', metavar='x', default=100, type=int,
+    parser.add_argument('--grid-size', metavar='x', default=250, type=int,
                         help='the size of the grid')
-    parser.add_argument('--epochs', metavar='n', default=2, type=int, help='number of epochs')
+    parser.add_argument('--epochs', metavar='n', default=25, type=int, help='number of epochs')
     parser.add_argument('--batch-size', metavar='x', type=int, default=64, help='number of batches')
     parser.add_argument('--dense-layers', metavar='n', type=int, default=25,
                         help='number of dense layers per level')
