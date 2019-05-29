@@ -14,11 +14,8 @@ def main(args):
 
     :param args: The arguments passed upon calling the module.
     """
-    if args.name is None:
-        args.name = args.dist
-
     now = datetime.now().strftime("%Y%m%d%H%M%S")
-    path = os.path.join(os.getcwd(), 'output', args.name + '-' + now)
+    path = os.path.join(args.path, args.name + '-' + now)
 
     if not os.path.exists(path):
         os.makedirs(path)
@@ -79,9 +76,15 @@ def parse_args():
                         help='size of the kernels')
     parser.add_argument('--name', metavar='modelname', type=str,
                         help='if not set, the name will be deduced from the distribution used')
+    parser.add_argument('--path', metavar='p', default='~/output', type=str,
+                        help='path to store the output in; ~/output/ used if not set')
     parser.add_argument('--plot-model', action='store_true', help='saves the model as a .png file')
 
     args = parser.parse_args()
+
+    if args.name is None:
+        args.name = args.dist
+    args.path = os.path.expanduser(args.path)
 
     return args
 
