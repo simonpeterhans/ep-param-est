@@ -38,6 +38,7 @@ class Model(keras.Model):
         """
         super().__init__()
 
+        self.history = History()
         self.model_name = name
         self.n_samples = n_samples
         self.n_epochs = n_epochs
@@ -51,14 +52,9 @@ class Model(keras.Model):
         self.out_dense_2 = (desired_grid_size + kernel_size - 1) // n_dense_layers
         self.grid_size = self.out_dense_2 * n_dense_layers - kernel_size + 1
 
-        print("Calculated parameters:", "out_dense_2 =", self.out_dense_2, ", grid_size =",
-              self.grid_size)
-
-        self.history = History()
+        print("grid_size =", self.grid_size, ", out_dense_2 =", self.out_dense_2)
 
         self.__create_model()
-
-        # TODO Give feedback about parameter settings (especially grid_size).
 
     def loss_to_csv(self, path):
         """
