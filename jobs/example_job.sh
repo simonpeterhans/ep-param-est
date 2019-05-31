@@ -10,7 +10,7 @@
 module load Miniconda3/4.3.27
 
 # Load venv, execute script.
-source activate nn-venv
+source activate YOUR_VENV
 
 # Train stuff.
 python3 -m param --dist norm --dist-args -10 10 -3 3 0.5 3 --gen-mode --n-samples 100000 --grid-size 1000 --epochs 50 --dense-layers 40 --depth 25 --kernels 15 --kernel-size 41 --name gen1000-100000 &
