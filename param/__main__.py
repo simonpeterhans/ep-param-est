@@ -1,4 +1,5 @@
 import os
+import time
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from datetime import datetime
 
@@ -19,6 +20,8 @@ def main(args):
 
     if not os.path.exists(path):
         os.makedirs(path)
+
+    start_time = time.clock()
 
     model = Model(args.n_samples, args.grid_size, args.epochs, args.batch_size, args.dense_layers,
                   args.dense_factor, args.depth, args.kernels, args.kernel_size, args.name)
@@ -51,6 +54,11 @@ def main(args):
 
     model.save(os.path.join(path, 'model.h5'))
     model.loss_to_csv(os.path.join(path, 'loss.csv'))
+
+    f = open(os.path.join(path, 'model.log'), "w")
+    f.write("Generator Mode: %s\n" % str(args.gen_mode))
+    f.write("Execution Time (s): %s\n" % str(time.clock() - start_time))
+    f.close()
 
 
 def parse_args():  # TODO Add epilog with detailed description.
